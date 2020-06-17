@@ -28,17 +28,14 @@ class CarTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
-        // Configure the view for the selected state
     }
     
     override func layoutSubviews() {
-        
         innerView.layer.cornerRadius = cornerRadius
         let shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         innerView.layer.masksToBounds = false
@@ -57,7 +54,7 @@ class CarTableViewCell: UITableViewCell {
          imageCar.image = UIImage(named: "placeholder_not_found")
       }
       price.text = car.price
-      model.text = "\(car.make) \(car.model) \(car.yearFab) \(car.km) KM "
+      model.text = "\(car.make) \(car.model) \(car.yearFab) \(car.km) KM"
       detail.text = car.version
     }
 

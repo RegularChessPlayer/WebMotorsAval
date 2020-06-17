@@ -25,34 +25,38 @@ class ViewController: UIViewController {
     
     func fetchCars() {
         self.alertLoading()
-        NetWorkManager.shared.fetchCars(page: page, sucessCallBack: { (cars) in
+        NetWorkManager.shared.fetchCars(page: page, sucessCallBack: { [weak self] (cars) in
+            guard let self = self else { return }
             self.cars += cars
             self.page += 1
             self.tableView.reloadData()
             self.isLoadingList = false
             self.dismiss(animated: false, completion: nil)
-        }) { (error) in
+        }){ [weak self] (error) in
+            guard let self = self else { return }
             self.isLoadingList = false
             self.dismiss(animated: false, completion: nil)
-            self.alertError(title: "Erro", message: error.localizedDescription)
+            self.alertError(title: localizedString(forKey: "ERROR"), message: error.localizedDescription)
         }
     }
     
     func alertLoading(){
-        let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+        let alert = UIAlertController(title: nil, message: localizedString(forKey: "WAIT"), preferredStyle: .alert)
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
         loadingIndicator.hidesWhenStopped = true
         loadingIndicator.style = UIActivityIndicatorView.Style.large
         loadingIndicator.startAnimating();
         alert.view.addSubview(loadingIndicator)
-        DispatchQueue.main.async() {
+        
+        DispatchQueue.main.async() { [weak self] in
+            guard let self = self else { return }
             self.present(alert, animated: true, completion: nil)
         }
     }
     
     func alertError(title: String, message: String) {
         let alert = UIAlertController(title:  title, message: message, preferredStyle:  .alert)
-        let button = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        let button = UIAlertAction(title: localizedString(forKey: "OK"), style: .cancel, handler: nil)
         alert.addAction(button)
         self.present(alert, animated: true, completion: nil)
     }

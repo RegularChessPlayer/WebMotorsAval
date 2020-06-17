@@ -36,16 +36,23 @@ class DetailViewController: UIViewController {
         guard let make = car?.make, let model = car?.model, let version = car?.version,
             let km = car?.km, let price = car?.price, let yearModel = car?.yearModel,
             let yearFab = car?.yearFab, let color = car?.color else{
-                titleCar.text = "Não Informado"
+                titleCar.text = localizedString(forKey: "NOT_INFO")
                 return
         }
-        titleCar.text = "\(make) \(model) Ano: \(yearModel) \(km) KM"
-        detail.text = """
-         Versão: \(version)
         
-         Cor: \(color)
-         Preço: \(price)
-         Ano de Fabricação: \(yearFab)
+        let YEAR = localizedString(forKey: "YEAR")
+        let VERSION = localizedString(forKey: "VERSION")
+        let COLOR = localizedString(forKey: "COLOR")
+        let PRICE = localizedString(forKey: "PRICE")
+        let FABYEAR = localizedString(forKey: "FAB_YEAR")
+        
+        titleCar.text = "\(make) \(model) \(YEAR): \(yearModel) \(km) KM"
+        detail.text = """
+         \(VERSION): \(version)
+        
+         \(COLOR): \(color)
+         \(PRICE): \(price)
+         \(FABYEAR): \(yearFab)
         """
     }
     
