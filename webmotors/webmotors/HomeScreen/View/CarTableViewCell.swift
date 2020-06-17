@@ -16,9 +16,15 @@ class CarTableViewCell: UITableViewCell {
     @IBOutlet weak var price: UILabel!
     @IBOutlet weak var model: UILabel!
     @IBOutlet weak var detail: UILabel!
-    @IBOutlet weak var yearFab: UILabel!
-    @IBOutlet weak var version: UILabel!
-    @IBOutlet weak var status: UILabel!
+    @IBOutlet weak var innerView: UIView!
+    
+    @IBInspectable var cornerRadius: CGFloat = 5.0
+    @IBInspectable var borderColor: CGColor = UIColor.clear.cgColor
+    @IBInspectable var shadowOffsetWidth: Int = 0
+    @IBInspectable var shadowOffsetHeight: Int = 3
+    @IBInspectable var shadowColor: UIColor? = UIColor.white
+    @IBInspectable var shadowOpacity: Float = 0.5
+
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -31,17 +37,28 @@ class CarTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    override func layoutSubviews() {
+        
+        innerView.layer.cornerRadius = cornerRadius
+        let shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+        innerView.layer.masksToBounds = false
+        innerView.layer.shadowColor = shadowColor?.cgColor
+        innerView.layer.shadowOffset = CGSize(width: shadowOffsetWidth, height: shadowOffsetHeight);
+        innerView.layer.shadowOpacity = shadowOpacity
+        innerView.layer.shadowPath = shadowPath.cgPath
+        innerView.layer.borderWidth = 1.0
+        innerView.layer.borderColor = UIColor(red:192.0/255.0, green:57.0/255.0, blue:43.0/255.0, alpha:1.0).cgColor
+    }
+    
    func configureCell(car: Car){
       if let urlRequest = URL(string: car.image) {
           imageCar.af.setImage(withURL: urlRequest, placeholderImage: UIImage(named: "placeholder"))
       }else{
          imageCar.image = UIImage(named: "placeholder_not_found")
       }
-      yearFab.text = "Ano: \(car.yearFab)"
-      price.text = "R$: \(car.price)"
-      model.text = car.model
-      detail.text = "\(car.km) KM"
-      version.text = car.version
+      price.text = car.price
+      model.text = "\(car.make) \(car.model) \(car.yearFab) \(car.km) KM "
+      detail.text = car.version
     }
 
 }

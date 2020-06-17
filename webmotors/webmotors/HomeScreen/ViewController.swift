@@ -78,7 +78,6 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UITableViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        print(self.isLoadingList)
         if (((scrollView.contentOffset.y + scrollView.frame.size.height) > scrollView.contentSize.height ) && !isLoadingList){
             self.isLoadingList = true
             self.fetchCars()
@@ -86,7 +85,14 @@ extension ViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let car = cars[indexPath.row]
-        print("Touch in \(car.model)")
+        performSegue(withIdentifier: DetailViewController.mySegue, sender: indexPath.row)
+    }
+    
+}
+
+extension ViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let position = sender as? Int, let detailVc = segue.destination as? DetailViewController else { return }
+        detailVc.car = cars[position]
     }
 }
