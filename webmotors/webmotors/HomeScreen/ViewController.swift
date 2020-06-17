@@ -7,15 +7,13 @@
 //
 
 import UIKit
-import Alamofire
-import AlamofireImage
 
 class ViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     
     var page = 1
-    var isLoadingList : Bool = false
+    var isLoadingList : Bool = true
     var cars: [Car] = []
     
     override func viewDidLoad() {
@@ -26,15 +24,37 @@ class ViewController: UIViewController {
     }
     
     func fetchCars() {
-        AF.request("http://desafioonline.webmotors.com.br/api/OnlineChallenge/Vehicles?Page=\(page)")
-          .validate()
-          .responseDecodable(of: Array<Car>.self) { (response) in
-             guard let cars = response.value else { return }
-             self.cars += cars
-             self.page += 1
-             self.tableView.reloadData()
-             self.isLoadingList = false
+        self.alertLoading()
+        NetWorkManager.shared.fetchCars(page: page, sucessCallBack: { (cars) in
+            self.cars += cars
+            self.page += 1
+            self.tableView.reloadData()
+            self.isLoadingList = false
+            self.dismiss(animated: false, completion: nil)
+        }) { (error) in
+            self.isLoadingList = false
+            self.dismiss(animated: false, completion: nil)
+            self.alertError(title: "Erro", message: error.localizedDescription)
         }
+    }
+    
+    func alertLoading(){
+        let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.style = UIActivityIndicatorView.Style.large
+        loadingIndicator.startAnimating();
+        alert.view.addSubview(loadingIndicator)
+        DispatchQueue.main.async() {
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func alertError(title: String, message: String) {
+        let alert = UIAlertController(title:  title, message: message, preferredStyle:  .alert)
+        let button = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alert.addAction(button)
+        self.present(alert, animated: true, completion: nil)
     }
 }
 
@@ -46,22 +66,8 @@ extension ViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: CarTableViewCell.cellIdentifier, for: indexPath) as? CarTableViewCell {
-
             let car = cars[indexPath.row]
-            if let urlRequest = URL(string: car.image) {
-                let placeholderImage = UIImage(named: "placeholder")!
-                cell.imageCar.af.setImage(withURL: urlRequest, placeholderImage: placeholderImage)
-            }else{
-                let placeholderNotFound = UIImage(named: "placeholder_not_found")!
-                cell.imageCar.image = placeholderNotFound
-            }
-            
-            cell.yearFab.text = "Ano: \(car.yearFab)"
-            cell.price.text = "R$: \(car.price)"
-            cell.model.text = car.model
-            cell.detail.text = "\(car.km) KM"
-            cell.version.text = car.version
-            
+            cell.configureCell(car: car)
             return cell
         } else {
             return UITableViewCell()
@@ -72,6 +78,7 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UITableViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print(self.isLoadingList)
         if (((scrollView.contentOffset.y + scrollView.frame.size.height) > scrollView.contentSize.height ) && !isLoadingList){
             self.isLoadingList = true
             self.fetchCars()

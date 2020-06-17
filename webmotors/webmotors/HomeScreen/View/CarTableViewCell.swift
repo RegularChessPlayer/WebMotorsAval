@@ -30,5 +30,18 @@ class CarTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    
+   func configureCell(car: Car){
+      if let urlRequest = URL(string: car.image) {
+          imageCar.af.setImage(withURL: urlRequest, placeholderImage: UIImage(named: "placeholder"))
+      }else{
+         imageCar.image = UIImage(named: "placeholder_not_found")
+      }
+      yearFab.text = "Ano: \(car.yearFab)"
+      price.text = "R$: \(car.price)"
+      model.text = car.model
+      detail.text = "\(car.km) KM"
+      version.text = car.version
+    }
 
 }
